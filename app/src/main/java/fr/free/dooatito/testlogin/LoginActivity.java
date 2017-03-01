@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                         result.append(line);
                         System.out.println(line);
                     }
-
+    
                     // Pass data to onPostExecute method
                     return(result.toString());
 
