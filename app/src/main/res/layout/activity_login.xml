@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:text="Valider"
         android:id="@+id/button"
+        android:background="@drawable/selector_xml_btn_yellow"
         android:layout_below="@+id/password"
         android:layout_marginTop="10dp"
         android:onClick="checkLogin"/>

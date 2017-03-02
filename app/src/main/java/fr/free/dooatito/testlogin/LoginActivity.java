@@ -23,8 +23,6 @@ import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // CONNECTION_TIMEOUT and READ_TIMEOUT are in milliseconds
-
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
     private EditText etEmail;
@@ -35,20 +33,20 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Get Reference to variables
+        // Variables
         etEmail = (EditText) findViewById(R.id.email);
         etPassword = (EditText) findViewById(R.id.password);
 
     }
 
-    // Triggers when LOGIN Button clicked
+    // Quand on click sur le boutton Valider:
     public void checkLogin(View arg0) {
 
-        // Get text from email and passord field
+        // obtient les valeurs
         final String email = etEmail.getText().toString();
         final String password = etPassword.getText().toString();
 
-        // Initialize  AsyncLogin() class with email and password
+        // initialise AsyncLogin() avec email et password:
         new AsyncLogin().execute(email,password);
 
     }
@@ -63,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            //this method will be running on UI thread
-            pdLoading.setMessage("\tLoading...");
+            //ecran de chargement:
+            pdLoading.setMessage("\tChargement...");
             pdLoading.setCancelable(false);
             pdLoading.show();
 
@@ -73,8 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
 
-                // Enter URL address where your php file resides
-                url = new URL("http://192.168.1.79:8888/testLogin/login.inc.php");
+                // adresse en fonction de l'ip de l'ordinateur:
+                url = new URL("http://10.0.2.129:8888/testLogin/login.inc.php");
 
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -82,23 +80,23 @@ public class LoginActivity extends AppCompatActivity {
                 return "exception";
             }
             try {
-                // Setup HttpURLConnection class to send and receive data from php and mysql
+                // Classe HttpURLConnection pour recevoir et envoyer les requetes sql
                 conn = (HttpURLConnection)url.openConnection();
                 conn.setReadTimeout(READ_TIMEOUT);
                 conn.setConnectTimeout(CONNECTION_TIMEOUT);
                 conn.setRequestMethod("POST");
 
-                // setDoInput and setDoOutput method depict handling of both send and receive
+                // setDoInput et setDoOutput pour gerer ce qu'on reçoit et ce qu'on envoie
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
 
-                // Append parameters to URL
+                // ajoute les paramètre à l'url:
                 Uri.Builder builder = new Uri.Builder()
                         .appendQueryParameter("username", params[0])
                         .appendQueryParameter("password", params[1]);
                 String query = builder.build().getEncodedQuery();
 
-                // Open connection for sending data
+                // Ouvre la connexion:
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(os, "UTF-8"));
@@ -118,10 +116,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 int response_code = conn.getResponseCode();
 
-                // Check if successful connection made
+                // vérifie si la connexion a réussi
                 if (response_code == HttpURLConnection.HTTP_OK) {
 
-                    // Read data sent from server
+                    // lie les données du serveur:
                     InputStream input = conn.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(input));
                     StringBuilder result = new StringBuilder();
@@ -131,8 +129,8 @@ public class LoginActivity extends AppCompatActivity {
                         result.append(line);
                         System.out.println(line);
                     }
-    
-                    // Pass data to onPostExecute method
+
+                    // envoie les données à la méthode onPostExecute
                     return(result.toString());
 
                 }else{
@@ -153,15 +151,15 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
 
-            //this method will be running on UI thread
+            //methode fonctionnant sur l'UI
 
             pdLoading.dismiss();
 
             if(result.equalsIgnoreCase("true"))
             {
 
-                /* Here launching another activity when login successful. If you persist login state
-                use sharedPreferences of Android. and logout button to clear sharedPreferences.
+                /* 0n lance une autre activité en cas d'identification réussie. Voir
+                sharedPreferences sur Android, et bouton logout
                  */
 
                 Intent intent = new Intent(LoginActivity.this,SecondActivity.class);
@@ -170,12 +168,12 @@ public class LoginActivity extends AppCompatActivity {
 
             }else if (result.equalsIgnoreCase("false")){
 
-                // If username and password does not match display a error message
-                Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_LONG).show();
+                // Message d'erreur en cas de mauvais identifiants:
+                Toast.makeText(LoginActivity.this, "Email ou mot de passe incorrect", Toast.LENGTH_LONG).show();
 
             } else if (result.equalsIgnoreCase("exception") || result.equalsIgnoreCase("unsuccessful")) {
                 System.out.println("on est dans: if result.equalsIgnoreCase(exception)");
-                Toast.makeText(LoginActivity.this, "OOPs! Something went wrong. Connection Problem.", Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Problème de connexion.", Toast.LENGTH_LONG).show();
 
             }
         }
